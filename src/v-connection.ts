@@ -113,10 +113,14 @@ export interface ExternalElement extends VElement {
 	name?: string
 }
 
-/** Object uniquely identifying an element loaded into an Engine */
+/** Object uniquely identifying an external element loaded into an Engine */
 export interface ExternalElementId {
+	/** Unique identifier for the template in the external system. */
 	vcpid: number
-	channelName?: string
+	/** Optional channel specifier used to define which Viz Engines the graphics play on.
+	 *  Note when `undefined`, the default is the _program_ channel.
+	 */
+	channel?: string
 }
 
 /**
@@ -178,63 +182,71 @@ export interface VRundown {
 	 *  List all the graphical elements created for this rundown.
 	 *  @returns Resolves to a list of graphical element names or references for this rundown.
 	 */
-	listElements(): Promise<Array<string | number>>
+	listElements(): Promise<Array<string | ExternalElementId>>
 	/**
 	 *  Read the details of a graphical element in this rundown.
-	 *  @param elementName Name or reference for the element to retrieve the details
+	 *  @param elementName Name or reference (vcpid) for the element to retrieve the details
 	 *                     for.
+	 *  @param channel Optional channel to play out this graphic. Default is the _program_.
 	 *  @returns Resolves to provide the details of the named element.
 	 */
-	getElement(elementName: string | number): Promise<VElement>
+	getElement(elementName: string | number, channel?: string): Promise<VElement>
 	/**
 	 *  Delete a graphical element from the rundown.
-	 *  @param elementName Name of reference for the element to delete.
+	 *  @param elementName Name or reference (vcpid) for the element to delete.
+	 *  @param channel Optional channel to play out this graphic. Default is the _program_.
 	 *  @returns Resolves to indicate the delete was successful, otherwise rejects.
 	 */
-	deleteElement(elementName: string | number): Promise<PepResponse>
+	deleteElement(elementName: string | number, channel?: string): Promise<PepResponse>
 	/**
 	 *  Send a _cue_ command for a named graphical element, preparing it for smooth display.
-	 *  @param elementName Name or reference for the gephical element to cue.
+	 *  @param elementName Name or reference (vcpid) for the gephical element to cue.
+	 *  @param channel Optional channel to play out this graphic. Default is the _program_.
 	 *  @returns Resolves on acceptance of the cue command.
 	 */
-	cue(elementName: string | number): Promise<CommandResult>
+	cue(elementName: string | number, channel?: string): Promise<CommandResult>
 	/**
 	 *  Send a _take_ command for a named graphical element, requesting that it is displayed.
-	 *  @param elementName Name or reference for the gephical element to take in.
+	 *  @param elementName Name or reference (vcpid) for the gephical element to take in.
+	 *  @param channel Optional channel to play out this graphic. Default is the _program_.
 	 *  @returns Resolves on acceptance of the take command.
 	 */
-	take(elementName: string | number): Promise<CommandResult>
+	take(elementName: string | number, channel?: string): Promise<CommandResult>
 	/**
 	 *  Send a _continue_ command for a named graphical element, causing the next
 	 *  presentation state is to be displayed.
-	 *  @param elementName Name or reference for the gephical element to continue.
+	 *  @param elementName Name or reference (vcpid) for the gephical element to continue.
+	 *  @param channel Optional channel to play out this graphic. Default is the _program_.
 	 *  @returns Resolves on acceptance of the continue command.
 	 */
-	continue(elementName: string | number): Promise<CommandResult>
+	continue(elementName: string | number, channel?: string): Promise<CommandResult>
 	/**
 	 *  Send a _continue-reverse_ command for a named graphical element, causing the
 	 *  previous presentation state is to be displayed.
-	 *  @param elementName Name or reference for the gephical element to continue.
+	 *  @param elementName Name or reference (vcpid) for the gephical element to continue.
+	 *  @param channel Optional channel to play out this graphic. Default is the _program_.
 	 *  @returns Resolves on acceptance of the continue command.
 	 */
-	continueReverse(elementName: string | number): Promise<CommandResult>
+	continueReverse(elementName: string | number, channel?: string): Promise<CommandResult>
 	/**
 	 *  Send an _out_ command for the named graphical element, ending its ongoing
 	 *  display.
-	 *  @param elementName Name or reference for the graphical element to take-out.
+	 *  @param elementName Name or reference (vcpid) for the graphical element to take-out.
+	 *  @param channel Optional channel to play out this graphic. Default is the _program_.
 	 *  @return Resolves on acceptance of the take-out command.
 	 */
-	out(elementName: string | number): Promise<CommandResult>
+	out(elementName: string | number, channel?: string): Promise<CommandResult>
 	/**
 	 *  Run the initiaization of an external graphic element. This will cause the
 	 *  element to load all necessary resources onto the assiciated VizEngine ready
 	 *  to be taken. Watch for `loaded="1.00"` in the element reference in the
 	 *  playlist to know when it is safe to take the element.
-	 *  @param elementName Reference for the graphical element to initialize.
+	 *  @param vcpid Reference for the graphical element to initialize.
+	 *  @param channel Optional channel to play out this graphic. Default is the _program_.
 	 *  @returns Resolves on acceptance of the initialize command. Note that this
 	 *           is not when the element finishes loading on the VizEngine.
 	 */
-	initialize(elementName: number): Promise<CommandResult>
+	initialize(vcpid: number, channel?: string): Promise<CommandResult>
 	/**
 	 *  Activate a rundown, causing all initialisations to be requested prior to
 	 *  the execution of a rundown. Note that experimentation has shown that it
